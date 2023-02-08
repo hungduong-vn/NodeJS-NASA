@@ -1,8 +1,8 @@
 const http = require('http');
 const app = require('./app');
-const { APP_PORT } = require('./configs/index.configs');
+// const { APP_PORT } = require('./configs/index.configs');
 
-const PORT = APP_PORT || 3030;
+const PORT = 8080;
 
 const server = http.createServer(app);
 
