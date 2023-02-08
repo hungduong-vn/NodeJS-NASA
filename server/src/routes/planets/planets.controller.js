@@ -1,6 +1,8 @@
-const planets = require("../../models/planets.model");
+const { loadPlanetsData } = require("../../models/planets.model");
 
-function getAllPlanets(req, res) {
+async function getAllPlanets(req, res) {
+  const planets = await loadPlanetsData();
+  // console.log(planets);
   res.status(200).json(planets);
 }
 
