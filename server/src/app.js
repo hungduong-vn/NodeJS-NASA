@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api", rootRouter);
-app.get("/", (req, res) => {
+app.get("/*", (req, res) => {
   console.log('home')
   res.sendFile(path.join(__dirname, "..", "public", "index.html"));
 });
