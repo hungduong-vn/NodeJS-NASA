@@ -4,7 +4,8 @@
   "description": "",
   "main": "./src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test-watch": "jest --watch",
     "start": "nodemon ./src/server.js",
     "launch": "node ./src/server.js"
   },
@@ -19,6 +20,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "jest": "^29.4.2",
     "nodemon": "^2.0.20"
   }
 }
