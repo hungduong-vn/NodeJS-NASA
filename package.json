@@ -1,0 +1,27 @@
+{
+  "name": "nodejs-nasa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install-server": "npm install --prefix server",
+    "install-client": "npm install --prefix client",
+    "install": "npm install-server && npm install-client",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "npm start --prefix server",
+    "client": "npm start --prefix client",
+    "start": "npm run server & npm run client",
+    "deploy": "npm run build --prefix client && npm run launch --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jasper-Duong/NodeJS-NASA.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jasper-Duong/NodeJS-NASA/issues"
+  },
+  "homepage": "https://github.com/Jasper-Duong/NodeJS-NASA#readme"
+}
