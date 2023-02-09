@@ -1,7 +1,7 @@
 const { Router } = require("express");
-const { getLaunches } = require("./launches.controller");
+const { httpGetLaunches } = require("./launches.controller");
 const launchesRouter = Router();
 
-launchesRouter.get("/", getLaunches);
+launchesRouter.get("/", httpGetLaunches);
 
 module.exports = launchesRouter;
