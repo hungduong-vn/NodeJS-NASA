@@ -7,11 +7,12 @@
     "install-server": "npm install --prefix server",
     "install-client": "npm install --prefix client",
     "install": "npm install-server && npm install-client",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm test --prefix server && npm test --prefix client",
     "server": "npm start --prefix server",
     "client": "npm start --prefix client",
     "start": "npm run server & npm run client",
-    "deploy": "npm run build --prefix client && npm run launch --prefix server"
+    "deploy": "npm run build --prefix client && npm run launch --prefix server",
+    "deploy-cluster": "npm run build --prefix client && npm run cluster --prefix server"
   },
   "repository": {
     "type": "git",
