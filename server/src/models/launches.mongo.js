@@ -13,3 +13,5 @@ const launchesSchemas = new mongoose.Schema({
   success: { type: Boolean, required: true, default: true },
   customers: [String],
 });
+
+module.exports = mongoose.model("Launch", launchesSchemas);
