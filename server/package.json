@@ -4,15 +4,18 @@
   "description": "",
   "main": "./src/server.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "test-watch": "jest --watch",
-    "start": "nodemon ./src/server.js",
-    "launch": "node ./src/server.js",
+    "start": "node ./src/server.js",
+    "launch": "nodemon ./src/server.js",
     "cluster": "pm2 start ./src/server.js -i max"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "csv-parse": "^5.3.5",
