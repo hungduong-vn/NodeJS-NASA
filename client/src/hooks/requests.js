@@ -1,4 +1,6 @@
-const API_URL = "http://localhost:8080/api/v1";
+// const API_URL = "http://localhost:8080/api/v1";
+
+const API_URL = "api/v1"; // Same origin as the Backend -> Omit host & port
 
 async function httpGetPlanets() {
   const path = `${API_URL}/planets`;
