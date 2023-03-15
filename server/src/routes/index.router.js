@@ -1,9 +1,7 @@
 const { Router } = require("express");
-const launchesRouter = require("./launches/launches.router");
-const planetsRouter = require("./planets/planets.router");
+const api = require("./api");
 const rootRouter = Router();
 
-rootRouter.use("/planets", planetsRouter);
-rootRouter.use("/launches", launchesRouter);
+rootRouter.use("/v1", api);
 
 module.exports = rootRouter;
