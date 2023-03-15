@@ -4,8 +4,6 @@ const fs = require("fs");
 
 const planets = require("./planets.mongo");
 
-const habitablePlanets = [];
-
 const isHabitable = (planet) => {
   return (
     planet.koi_disposition === "CONFIRMED" &&
@@ -27,11 +25,7 @@ const loadPlanetsData = (
       .on("data", async (chunk) => {
         if (isHabitable(chunk)) {
           // Upsert: Insert (1st arg) if not exist, Other -> Update (2nd arg)
-          await planets.updateOne(
-            { keplerName: chunk.kepler_name },
-            { keplerName: chunk.kepler_name },
-            { upsert: true }
-          );
+          savePlanet(chunk);
         }
       })
       .on("error", (error) => {
@@ -39,13 +33,17 @@ const loadPlanetsData = (
         reject(error);
       })
       .on("end", () => {
-        resolve(planets);
+        resolve();
       });
   });
 
+const getAllPlanets = async () => {
+  return await planets.find({});
+};
+
 const savePlanet = async (planet) => {
   try {
-    await planets.create(
+    await planets.updateOne(
       { keplerName: planet.kepler_name },
       { keplerName: planet.kepler_name },
       { upsert: true }
@@ -55,4 +53,4 @@ const savePlanet = async (planet) => {
   }
 };
 
-module.exports = { loadPlanetsData };
+module.exports = { loadPlanetsData, getAllPlanets };

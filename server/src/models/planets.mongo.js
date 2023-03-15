@@ -4,4 +4,4 @@ const planetsSchemas = new mongoose.Schema({
   keplerName: { type: String, required: true },
 });
 
-module.exports = mongoose.model("planet", planetsSchemas);
+module.exports = mongoose.model("Planet", planetsSchemas);
