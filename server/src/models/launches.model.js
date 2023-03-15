@@ -1,44 +1,117 @@
-// const launches = require('./launches.mongo');
+const launchesDB = require("./launches.mongo");
+const axios = require("axios");
+const planets = require("./planets.mongo");
 
-const launches = new Map();
+// const launches = new Map();
 
-let latestFlightNumber = 100;
+const DEFAULT_FLIGHT_NUMBER = 100; 
 
-const launch = {
-  mission: "Kepler Exploration X",
-  rocket: "Explorer IS1",
-  launchDate: new Date("December 27, 2030"),
-  target: "Kepler-442 b",
-  customers: ["Hung", "NASA"],
-  flightNumber: latestFlightNumber,
-  upcoming: true,
-  success: true,
-};
+// launches.set(launch.flightNumber, launch);
 
-launches.set(launch.flightNumber, launch);
+async function getAllLaunches(limit, skip) {
+  return await launchesDB
+    .find({}, { _id: 0, __v: 0 })
+    .sort({ flightNumber: 1 })
+    .skip(skip)
+    .limit(limit);
+}
 
-const getAllLaunches = () => Array.from(launches.values());
+async function getLatestFlightNumber() {
+  // SORT ASC (default) based on "flightNumber" -> DESC ~ "-flightNumber"
+  const latestLaunch = await launchesDB.findOne({}).sort("-flightNumber");
+  return latestLaunch ? latestLaunch.flightNumber : DEFAULT_FLIGHT_NUMBER;
+}
 
-const addLaunch = (launch) => {
-  latestFlightNumber++;
-  launches.set(latestFlightNumber, {
+async function saveLaunch(launch) {
+  await launchesDB.updateOne({ flightNumber: launch.flightNumber }, launch, {
+    upsert: true,
+  });
+}
+
+async function populateLaunches() {
+  const response = await axios.post(SPACE_X_URL, {
+    query: {},
+    options: {
+      pagination: false,
+      populate: [
+        { path: "rocket", select: { name: 1 } },
+        { path: "payloads", select: { customers: 1 } },
+      ],
+    },
+  });
+  if (response.status !== 200) {
+    console.log("Problem populating launches!");
+    throw new Error("Launch data download failed");
+  }
+  const launchDocs = response.data.docs;
+  for (const launchDoc of launchDocs) {
+    const { payloads } = launchDoc;
+    const customers = payloads.flatMap((payload) => payload.customers);
+    const launch = {
+      flightNumber: launchDoc.flight_number,
+      mission: launchDoc.name,
+      rocket: launchDoc.rocket.name,
+      launchDate: launchDoc.date_local,
+      upcoming: launchDoc.upcoming,
+      success: launchDoc.success,
+      customers,
+    };
+    // console.log({ launch });
+    await saveLaunch(launch);
+  }
+}
+
+const SPACE_X_URL = "https://api.spacexdata.com/v4/launches/query";
+async function loadLaunchData() {
+  const firstLaunch = await findLaunch({
+    flightNumber: 1,
+    rocket: "Falcon",
+    mission: "FalconSat",
+  });
+  if (firstLaunch) {
+    console.log("Launch data already existed");
+    return;
+  } else {
+    await populateLaunches();
+  }
+}
+
+async function addLaunch(launch) {
+  const planet = await planets.findOne({ keplerName: launch.target });
+  if (!planet) {
+    throw new Error("No matching planets found!");
+  }
+  const newFlightNumber = (await getLatestFlightNumber()) + 1;
+  const newLaunch = {
     ...launch,
     customers: ["Hung", "NASA"],
-    flightNumber: latestFlightNumber,
     upcoming: true,
     success: true,
-  });
-};
+    flightNumber: newFlightNumber,
+  };
+  await saveLaunch(newLaunch);
+}
 
-const abortLaunch = (launchId) => {
-  const launch = launches.get(launchId);
-  console.log({ launchId });
-  if (launch) {
-    launch.upcoming = false;
-    launch.success = false;
-    return;
-  }
-  throw new Error("Launch not found!");
-};
+async function findLaunch(filter) {
+  return await launchesDB.findOne(filter);
+}
 
-module.exports = { getAllLaunches, addLaunch, abortLaunch };
+async function checkLaunchExist(launchId) {
+  return !!(await findLaunch({ flightNumber: launchId }));
+}
+
+async function abortLaunch(launchId) {
+  const aborted = await launchesDB.updateOne(
+    { flightNumber: launchId },
+    { upcoming: false, success: false }
+  );
+  return aborted.modifiedCount === 1;
+}
+
+module.exports = {
+  loadLaunchData,
+  getAllLaunches,
+  addLaunch,
+  abortLaunch,
+  checkLaunchExist,
+};
